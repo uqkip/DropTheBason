@@ -44,12 +44,31 @@ void loop() {
       // if at correct y-coord, switch to state 2
     // 2 - OSV is crossing the rocky terrain
       // rotate to face E
-      // if not over the rocky terrain, continue driving
-      // if over the rocky terrain, switch to state 3
+      // if not all the way over the rocky terrain, continue driving
+      // if completely over the rocky terrain, switch to state 3
     // 3 - OSV is in "easy" transit to mission site
       // if you see an obstacle: switch to state 4
+      // if at the wrong y-coord, switch to state 5
+      // if at cmission site x-coord, state 6
       // otherwise, drive forwards
-      // if at mission site x-coord, state 5
     // 4 - OSV encountered an obstable
-    // 5 - OSV is at mission site
+      // turn to face NS based on half of arena
+      // check for new obstacle
+        // if yes, turn 180 and check again
+          // if yes AGAIN. turn E and drive 35 cm
+          // then face NS (decision) and drive 70 cm
+        // if no
+          // drive 35 cm N/S and then turn W
+      // turn to face W
+      // switch to state 3
+    // 5 - OSV at wrong y-coord
+      // check for obstacle
+        // if no: drive 35 cm forward
+        // if yes: switch to state 4 and exit
+      // turn NS towards correct y-coord
+      // if obstacle not detected
+        // drive to correct y-coord and  and turn W
+        // switch to state 3
+      // else face W
+    // 6 - OSV is at mission site
 }
