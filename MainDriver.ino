@@ -18,12 +18,12 @@
 
 Enes100 enes("Drop the Bason", CHEMICAL, 19, 8, 9); //teamName, teamType, markerID, rxPin, txPin
 enum state{
-  landing,
-  rocky,
-  correctY,
-  obstacle,
-  wrongY,
-  missionSite
+  LANDING,
+  ROCKY,
+  CORRECT_Y,
+  OBSTACLE,
+  WRONG_Y,
+  MISSION_SITE
 };
 float xMS, yMS, xPos, yPos, theta;
 
@@ -31,7 +31,7 @@ void setup() {
   /* put your setup code here, to run once: */
   
   // Initializa values
-  state = landing;
+  state = LANDING;
   
   // Retreive mission coordinates
   while (!enes.retrieveDestination()) {
