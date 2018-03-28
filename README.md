@@ -15,6 +15,7 @@ Mini Projects to Help Understand Using the Arduino:
   ~ Activate and then reverse the direction of a motor
   ~ Activate a motor for a specified number of rotations (or time?)
   ~ Activate multiple motors
+  Resources: https://howtomechatronics.com/tutorials/arduino/ultrasonic-sensor-hc-sr04/
 
   ~ Recieve input from the ultrasonic sensor
   ~ Have the ultrasonic sensor detact an obstacle
