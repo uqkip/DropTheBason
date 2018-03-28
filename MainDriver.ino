@@ -14,17 +14,41 @@
  * - 
  */
 
-int state = 0;
+#include "Enes100.h"
+
+Enes100 enes("Drop the Bason", CHEMICAL, 19, 8, 9); //teamName, teamType, markerID, rxPin, txPin
+enum state{
+  landing,
+  rocky,
+  correctY,
+  obstacle,
+  wrongY,
+  missionSite
+};
+float xMS, yMS, xPos, yPos, theta;
 
 void setup() {
   /* put your setup code here, to run once: */
   
   // Initializa values
-  state = 1;
+  state = landing;
+  
   // Retreive mission coordinates
-  // Find starting location
-  // Find starting direction
+  while (!enes.retrieveDestination()) {
+    enes.println(" *** Unable to retrieve mission site coordinates *** ");
+  }
+  xMS = enes.destination.x;
+  yMS = enes.destination.y;
+  enes.println("Mission site at ("+xMS+", "+yMS+")");
 
+  // Get starting position
+  while(!enes.updateLocation()){
+    enes.println(" *** Unable to retrieve starting location. ***");
+  }
+  xPos = enes.location.x;
+  yPos = enes.location.y;
+  theta = enes.location.theta;
+  
   // SAMPLE: Hello World
   /*
   Serial.begin(9600);
@@ -35,9 +59,16 @@ void setup() {
 void loop() {
   /* put your main code here, to run repeatedly: */
   
-  // Update current position
-  
-  // Switch w/ cases:
+  // Don't move unless you have updated the location
+  if (!enes.updateLocation()){
+    enes.println(" *** Unable to update location. ***");
+  } else {
+    // Update current position
+    xPos = enes.location.x;
+    yPos = enes.location.y;
+    theta = enes.location.theta;
+    
+    // Switch w/ cases:
     // 1 - OSV is in landing zone
       // rotate to face correct NS direction
       // drive towards correct y-coord
@@ -71,4 +102,8 @@ void loop() {
         // switch to state 3
       // else face W
     // 6 - OSV is at mission site
+    
+  }
+  
+  // mission site subroutine is not depended on location updating
 }
