@@ -20,10 +20,12 @@ Mini Projects to Help Understand Using the Arduino:
   ~ Have the ultrasonic sensor detact an obstacle
   ~ Have the ultrasonic sensor detect an obstacle only within 10cm
   ~ Receive input from multiple ultrasonic sensors
-  
-Resources: https://howtomechatronics.com/tutorials/arduino/ultrasonic-sensor-hc-sr04/
 
   ~ Activate a servo motor through the arduino
   ~ Activate the servo for a specified (fractional) number of turns
   
   ~ Recieve input from the pH sensor through the arduino
+
+Resources:
+https://howtomechatronics.com/tutorials/arduino/ultrasonic-sensor-hc-sr04/
+https://howtomechatronics.com/tutorials/arduino/arduino-dc-motor-control-tutorial-l298n-pwm-h-bridge/
