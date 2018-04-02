@@ -16,6 +16,11 @@
 
 #include "Enes100.h"
 
+#define lm1 7
+#define lm2 6
+#define rm1 5
+#define rm2 4
+
 Enes100 enes("Drop the Bason", CHEMICAL, 19, 8, 9); //teamName, teamType, markerID, rxPin, txPin
 enum state{
   LANDING,
@@ -25,13 +30,18 @@ enum state{
   WRONG_Y,
   MISSION_SITE
 };
+// x from 0 to 4m, y from 0 to 2m, theta from -pi to pi rad
 float xMS, yMS, xPos, yPos, theta;
 
 void setup() {
   /* put your setup code here, to run once: */
   
   // Initializa values
-  state = LANDING;
+  state = LANDING; //TODO WHY IS THIS AN ERROR?
+  pinMode(lm1, OUTPUT);
+  pinMode(lm2, OUTPUT);
+  pinMode(rm1, OUTPUT);
+  pinMode(rm2, OUTPUT);
   
   // Retreive mission coordinates
   while (!enes.retrieveDestination()) {
@@ -48,12 +58,6 @@ void setup() {
   xPos = enes.location.x;
   yPos = enes.location.y;
   theta = enes.location.theta;
-  
-  // SAMPLE: Hello World
-  /*
-  Serial.begin(9600);
-  Serial.print("Hello world");
-  */
 }
 
 void loop() {
@@ -67,8 +71,20 @@ void loop() {
     xPos = enes.location.x;
     yPos = enes.location.y;
     theta = enes.location.theta;
-    
-    // Switch w/ cases:
+
+    milestone5();
+
+    movementCases();    
+  }
+  
+  if(state = MISSION_SITE){
+    missionSite()
+  }
+  
+}
+
+void movementCases(){
+  // Switch w/ cases:
     // 1 - OSV is in landing zone
       // rotate to face correct NS direction
       // drive towards correct y-coord
@@ -102,8 +118,91 @@ void loop() {
         // switch to state 3
       // else face W
     // 6 - OSV is at mission site
-    
-  }
-  
-  // mission site subroutine is not depended on location updating
 }
+
+void missionSite(){
+  
+}
+
+void milestone5(){
+  driveForward(1000);
+  driveStop(100);
+  driveBackward(1000);
+  driveStop(100);
+  
+  driveRight(250);
+  driveStop(100);
+  driveRight(250);
+  driveStop(100);
+  driveRight(250);
+  driveStop(100);
+  driveLeft(750);
+}
+
+/**
+ * Drives forwards
+ * time = miliseconds
+ */
+void driveForward(int time){
+  digitalWrite(lm1, LOW);
+  digitalWrite(lm2, HIGH);
+  digitalWrite(2m1, LOW);
+  digitalWrite(2m2, HIGH);
+  delay(time);
+}
+
+/**
+ * Drives forwards
+ * time = miliseconds
+ */
+void driveBackward(int time){
+  digitalWrite(lm1, HIGH);
+  digitalWrite(lm2, LOW);
+  digitalWrite(2m1, HIGH);
+  digitalWrite(2m2, LOW);
+  delay(time);
+}
+
+/**
+ * Turns right
+ * time = miliseconds
+ */
+void driveRight(int time){
+  digitalWrite(lm1, LOW);
+  digitalWrite(lm2, HIGH);
+  digitalWrite(2m1, HIGH);
+  digitalWrite(2m2, LOW);
+  delay(time);
+}
+
+/**
+ * Turns left
+ * time = miliseconds
+ */
+void driveLeft(int time){
+  digitalWrite(lm1, HIGH);
+  digitalWrite(lm2, LOW);
+  digitalWrite(2m1, LOW);
+  digitalWrite(2m2, HIGH);
+  delay(time);
+}
+
+/**
+ * Stops the wheel motors for a specified time
+ * time = miliseconds
+ */
+void driveStop(int time){
+  digitalWrite(lm1, LOW);
+  digitalWrite(lm2, LOW);
+  digitalWrite(2m1, LOW);
+  digitalWrite(2m2, LOW);
+  delay(time);
+}
+
+void turnToTheta(float angle){
+  while(theta != angle){ //make this have a little more leeaway (maybe convert to deg. and do whole deg?)
+    //see which way too turn
+    // turn a little
+  }
+}
+
