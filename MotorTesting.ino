@@ -14,7 +14,6 @@
 #define rm2 4
 
 void setup() {
-  pinMode(enA, OUTPUT);
   pinMode(lm1, OUTPUT);
   pinMode(lm2, OUTPUT);
   pinMode(rm1, OUTPUT);
