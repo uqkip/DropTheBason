@@ -22,14 +22,14 @@
 #define rm2 4
 
 Enes100 enes("Drop the Bason", CHEMICAL, 19, 8, 9); //teamName, teamType, markerID, rxPin, txPin
-enum state{
+/*enum state{
   LANDING,
   ROCKY,
   CORRECT_Y,
   OBSTACLE,
   WRONG_Y,
   MISSION_SITE
-};
+};*/
 // x from 0 to 4m, y from 0 to 2m, theta from -pi to pi rad
 float xMS, yMS, xPos, yPos, theta;
 
@@ -37,7 +37,7 @@ void setup() {
   /* put your setup code here, to run once: */
   
   // Initializa values
-  state = LANDING; //TODO WHY IS THIS AN ERROR?
+  //state = LANDING; //TODO WHY IS THIS AN ERROR?
   pinMode(lm1, OUTPUT);
   pinMode(lm2, OUTPUT);
   pinMode(rm1, OUTPUT);
@@ -77,9 +77,9 @@ void loop() {
     movementCases();    
   }
   
-  if(state = MISSION_SITE){
+  /*if(state = MISSION_SITE){
     missionSite()
-  }
+  }*/
 
   milestone5communication();
 }
@@ -126,18 +126,18 @@ void missionSite(){
 }
 
 void milestone5movement(){
-  driveForward(1000);
-  driveStop(1000);
-  driveBackward(1000);
-  driveStop(1000);
+  driveForward(12000);
+  driveStop(500);
+  driveBackward(12000);
+  driveStop(500);
   
-  driveRight(250);
-  driveStop(1000);
-  driveRight(250);
-  driveStop(1000);
-  driveRight(250);
-  driveStop(1000);
-  driveLeft(750);
+  driveRight(1000);
+  driveStop(500);
+  driveRight(1000);
+  driveStop(500);
+  driveRight(1000);
+  driveStop(500);
+  driveLeft(3000);
 }
 
 void milestone5communication(){
