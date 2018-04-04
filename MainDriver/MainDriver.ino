@@ -58,6 +58,8 @@ void setup() {
   xPos = enes.location.x;
   yPos = enes.location.y;
   theta = enes.location.theta;
+
+  milestone5movement();
 }
 
 void loop() {
@@ -72,15 +74,14 @@ void loop() {
     yPos = enes.location.y;
     theta = enes.location.theta;
 
-    milestone5();
-
     movementCases();    
   }
   
   if(state = MISSION_SITE){
     missionSite()
   }
-  
+
+  milestone5communication();
 }
 
 void movementCases(){
@@ -124,19 +125,34 @@ void missionSite(){
   
 }
 
-void milestone5(){
+void milestone5movement(){
   driveForward(1000);
-  driveStop(100);
+  driveStop(1000);
   driveBackward(1000);
-  driveStop(100);
+  driveStop(1000);
   
   driveRight(250);
-  driveStop(100);
+  driveStop(1000);
   driveRight(250);
-  driveStop(100);
+  driveStop(1000);
   driveRight(250);
-  driveStop(100);
+  driveStop(1000);
   driveLeft(750);
+}
+
+void milestone5communication(){
+  String direction = "";
+  if(yPos < yMS){
+    direction = direction+"North ";
+  } else if (yPos > yMS){
+    direction = direction+"South ";
+  }
+  if(xPos < xMS){
+    direction = direction+"East ";
+  } else if (xPos > xMS){
+    direction = direction+"West ";
+  }
+  enes.println("The mission site is "+direction+"of the OSV");
 }
 
 /**
