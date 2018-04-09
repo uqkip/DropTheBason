@@ -126,9 +126,9 @@ void missionSite(){
 }
 
 void milestone5movement(){
-  driveForward(12000);
+  driveForward(1000);
   driveStop(500);
-  driveBackward(12000);
+  driveBackward(1000);
   driveStop(500);
   
   driveRight(1000);
