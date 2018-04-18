@@ -33,11 +33,11 @@ Enes100 enes("Drop the Bason", CHEMICAL, 19, 8, 9); //teamName, teamType, marker
 // x from 0 to 4m, y from 0 to 2m, theta from -pi to pi rad
 float xMS, yMS, xPos, yPos, theta;
 
-const float pi = 3.14159;
-float tN = pi/2;
-float tS = -pi/2;
+const float pi = 3.14;
+float tN = 1.57;
+float tS = -1.57;
 float tE = 0;
-float tW1 = pi, tW2 = -pi;
+float tW1 = 3.14, tW2 = -3.14;
 
 void setup() {
   /* put your setup code here, to run once: */
@@ -139,18 +139,41 @@ void loop() {
 void milestone6init(){
   updateCoordMS();
   updateCoordOSV();
-  driveYCoordMS();
+  //driveYCoordMS();
+  turnToTheta(tN);
+  enes.print("Facing North! Theta is ");
+  enes.println(theta);
+  delay(1000);
+  turnToTheta(tE);
+  enes.print("Facing East! Theta is ");
+  enes.println(theta);
+  delay(1000);
+  turnToTheta(tS);
+  enes.print("Facing South! Theta is ");
+  enes.println(theta);
+  /*delay(1000);
+  turnToTheta(tW1);
+  enes.print("Facing West! Theta is ");
+  enes.println(theta);
+  delay(1000);
+  turnToTheta(tW2);
+  enes.print("Facing West! Theta is ");
+  enes.println(theta);
+  delay(1000);
+  turnToTheta(tN);
+  enes.print("Facing North! Theta is ");
+  enes.println(theta); */
 }
 
 void milestone6loop(){
-  if(max(theta, tE)-min(theta, tE) > 0.02){ //angle off by more than a degree
+  /*if(max(theta, tE)-min(theta, tE) > 0.02){ //angle off by more than a degree
     turnToTheta(tE);
   }
   if(xPos < xMS-.1){ //stop 10cm from mission site
     driveForward(0);
   } else {
     driveStop(0);
-  }
+  }*/
 }
 
 /**
@@ -174,14 +197,17 @@ void updateCoordMS(){
  * Updates the global variables of the OSV's
  * xPos, yPos, and angle theta
  */
-void updateCoordOSV(){
-  while (!enes.updateLocation()){
+boolean updateCoordOSV(){
+  if(!enes.updateLocation()){
     enes.println(" *** Unable to update location. ***");
+    return false;
+  }else{
+    // Update current position
+    xPos = enes.location.x;
+    yPos = enes.location.y;
+    theta = enes.location.theta;
+    return true;
   }
-  // Update current position
-  xPos = enes.location.x;
-  yPos = enes.location.y;
-  theta = enes.location.theta;
 }
 
 /**
@@ -250,28 +276,43 @@ void driveStop(int time){
  */
 void turnToTheta(float angle){
   float delta = max(theta, angle) - min(theta, angle);
+  float tolerance = 0.1;
+  enes.print("--- Delta: ");
+  enes.println(delta);
   if(delta > pi && theta > angle){
-    while(theta > angle){
-      driveLeft(0);
-      updateCoordOSV();
+    enes.println("Case 1");
+    while(theta-angle > tolerance){
+      driveLeft(1);
+      while(!updateCoordOSV()){
+        driveStop(0);
+      }
     }
     driveStop(0);
   } else if(delta > pi && theta < angle){
-    while(theta < angle){
-      driveRight(0);
-      updateCoordOSV();
+    enes.println("Case 2");
+    while(tolerance < angle-theta){
+      driveRight(1);
+      while(!updateCoordOSV()){
+        driveStop(0);
+      }
     }
     driveStop(0);
   } else if(delta < pi && theta > angle){
-    while(theta > angle){
-      driveRight(0);
-      updateCoordOSV();
+    enes.println("Case 3");
+    while(theta-angle > tolerance){
+      driveRight(1);
+      while(!updateCoordOSV()){
+        driveStop(0);
+      }
     }
     driveStop(0);
   } else if(delta < pi && theta < angle){
-    while(theta < angle){
-      driveLeft(0);
-      updateCoordOSV();
+    enes.println("Case 4");
+    while(tolerance < angle-theta){
+      driveLeft(1);
+      while(!updateCoordOSV()){
+        driveStop(0);
+      }
     }
     driveStop(0);
   }
