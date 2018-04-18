@@ -29,3 +29,12 @@ Mini Projects to Help Understand Using the Arduino:
 Resources:
 https://howtomechatronics.com/tutorials/arduino/ultrasonic-sensor-hc-sr04/
 https://howtomechatronics.com/tutorials/arduino/arduino-dc-motor-control-tutorial-l298n-pwm-h-bridge/
+
+
+Ideas for Solving RF Issues
+- Make the RF marker a little larger (keep the white border) and make sure all the black is completely dark
+- Set the course brightness on the mission control monitor lower
+- Have the OSV move slower
+Ideas for Solving turToTheta Issues
+- Make the OSV turn slower so it's less likely to overshoot
+- Check if it was successful at the end of the method and do recursion until correct
