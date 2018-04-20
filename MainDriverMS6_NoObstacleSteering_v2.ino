@@ -40,6 +40,7 @@ float tE = 0;
 float tW1 = 3.14, tW2 = -3.14;
 
 float tolerance = 0.01;
+int loops;
 
 void setup() {
   /* put your setup code here, to run once: */
@@ -142,6 +143,7 @@ void milestone6init(){
   updateCoordMS();
   updateCoordOSV();
   driveYCoordMS();
+  loops = 0;
   /*turnToTheta(tN);
   enes.print("Facing North! Theta is ");
   enes.println(theta);
@@ -168,14 +170,25 @@ void milestone6init(){
 }
 
 void milestone6loop(){
-  /*if(max(theta, tE)-min(theta, tE) > 0.02){ //angle off by more than a degree
-    turnToTheta(tE);
+  loops = loops+1;
+  //if(max(theta, tE)-min(theta, tE) > .1){ //angle off by more than a degree
+  if(loops%500 == 0){
+    if(max(yMS, yPos)-min(yMS, yPos) > .1){
+      driveYCoordMS();
+    }
+    else if(max(theta, tE)-min(theta, tE) > 3*tolerance){
+      turnToTheta(tE);
+    }
   }
-  if(xPos < xMS-.1){ //stop 10cm from mission site
-    driveForward(0);
+  if(xPos < xMS-.4){ //stop 20cm from mission site
+    driveForward(1);
+    while(!updateCoordOSV()){
+      driveStop(0);
+    }
   } else {
     driveStop(0);
-  }*/
+    enes.print("Made it to Mission Site!");
+  }
 }
 
 /**
@@ -205,9 +218,10 @@ boolean updateCoordOSV(){
     return false;
   }else{
     // Update current position
+    theta = enes.location.theta;
+    //TODO adjust position to represent center of OSV
     xPos = enes.location.x;
     yPos = enes.location.y;
-    theta = enes.location.theta;
     return true;
   }
 }
@@ -280,43 +294,46 @@ void turnToTheta(float angle){
   float delta = max(theta, angle) - min(theta, angle);
   enes.print("--- Delta: ");
   enes.println(delta);
-  if(delta > pi && theta > angle){
-    enes.println("Case 1");
-    while(theta-angle > tolerance){
-      driveLeft(1);
-      while(!updateCoordOSV()){
-        driveStop(0);
+  if(delta > 2*tolerance){
+    if(delta > pi && theta > angle){
+      enes.println("Case 1");
+      while(theta-angle > tolerance){
+        driveLeft(1);
+        while(!updateCoordOSV()){
+          driveStop(0);
+        }
       }
-    }
-    driveStop(0);
-  } else if(delta > pi && theta < angle){
-    enes.println("Case 2");
-    while(tolerance < angle-theta){
-      driveRight(1);
-      while(!updateCoordOSV()){
-        driveStop(0);
+      driveStop(0);
+    } else if(delta > pi && theta < angle){
+      enes.println("Case 2");
+      while(tolerance < angle-theta){
+        driveRight(1);
+        while(!updateCoordOSV()){
+          driveStop(0);
+        }
       }
-    }
-    driveStop(0);
-  } else if(delta < pi && theta > angle){
-    enes.println("Case 3");
-    while(theta-angle > tolerance){
-      driveRight(1);
-      while(!updateCoordOSV()){
-        driveStop(0);
+      driveStop(0);
+    } else if(delta < pi && theta > angle){
+      enes.println("Case 3");
+      while(theta-angle > tolerance){
+        driveRight(1);
+        while(!updateCoordOSV()){
+          driveStop(0);
+        }
       }
-    }
-    driveStop(0);
-  } else if(delta < pi && theta < angle){
-    enes.println("Case 4");
-    while(tolerance < angle-theta){
-      driveLeft(1);
-      while(!updateCoordOSV()){
-        driveStop(0);
+      driveStop(0);
+    } else if(delta < pi && theta < angle){
+      enes.println("Case 4");
+      while(tolerance < angle-theta){
+        driveLeft(1);
+        while(!updateCoordOSV()){
+          driveStop(0);
+        }
       }
+      driveStop(0);
     }
-    driveStop(0);
   }
+  
 }
 
 /**
