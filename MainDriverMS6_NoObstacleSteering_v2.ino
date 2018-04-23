@@ -42,6 +42,9 @@ float tW1 = 3.14, tW2 = -3.14;
 float tolerance = 0.01;
 int loops;
 
+float dD = 0; //dD is the diagonal displacement of the RF marker from center of OSV
+float phi = 0; //phi is the angle that dD makes with the outer edge of OSV in rad
+
 void setup() {
   /* put your setup code here, to run once: */
   
@@ -219,9 +222,26 @@ boolean updateCoordOSV(){
   }else{
     // Update current position
     theta = enes.location.theta;
-    //TODO adjust position to represent center of OSV
-    xPos = enes.location.x;
-    yPos = enes.location.y;
+    float xPos = enes.location.x;
+    float yPos = enes.location.y;
+    float alpha;
+    /*if(theta >= tE && theta <= tN){ //first quadrant
+      alpha = phi-theta;
+      xPos = xPosRF+dD*sin(alpha);
+      yPos = yPosRF-dD*cos(alpha);
+    } else if(theta >= tN){ //second quadrant
+      alpha = theta-phi-tN;
+      xPos = xPosRF+dD*sin(alpha);
+      yPos = yPosRF+dD*cos(alpha);
+    } else if (theta <= tE && theta >= tS) { //third quadrant
+      alpha = 2*tN-phi+theta;
+      xPos = xPosRF-dD*cos(alpha);
+      yPos = yPosRF-dD*sin(alpha);
+    } else {
+      alpha = 2*tN-phi+theta;
+      xPos = xPosRF-dD*cos(alpha);
+      yPos = yPosRF-dD*sin(alpha);
+    }*/
     return true;
   }
 }
