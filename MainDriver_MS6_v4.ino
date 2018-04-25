@@ -5,7 +5,7 @@
  * Created 3/26/18
  * 
  * Creator: Kendall Price
- * Contributors: James, Tori
+ * Contributors: James (Servo), Tori (pH)
  */
 
 // General Set-Up
@@ -132,6 +132,9 @@ void missionSiteLoop(){
   }
 }
 
+/**
+ * Got this code online. Does some array averaging for calculating pH
+ */
 double avergearray(int* arr, int number){
   int i, max, min;
   double avg;
