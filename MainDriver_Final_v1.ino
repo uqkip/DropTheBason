@@ -31,6 +31,7 @@ states state = LANDING_ZONE;
   NONE
 };
 obstacle detected = NONE; */
+boolean successful = false;
 
 // Motor Controller Set-Up
 #define lm1 7
@@ -118,12 +119,13 @@ void loop() {
       //TODO - what if it made it to the MS in the middle of this?
       break;
     case MISSION_SITE:
-      //TODO - adjust so OSV in right location
+      positionOSVatMS();
       enes.println("Made it to the mission site!");
+      enes.navigated();
       missionSiteInit();
-      while(true){
-        missionSiteLoop();
-        //TODO - adjust if unsuccessful
+      readPH();
+      while(!successful){
+        retryMS();
       }
       break;
     default:
@@ -186,7 +188,8 @@ float turnToAvoidObstacle(){
 }
 
 /**
- * N/S, E, S/N, checking for new obstacles along the way
+ * Drives 35cm North/South, 35cm East, and then back to original y-coord
+ * Ends facing East
  */
 void driveAroundObstacle(float tInit, float xInit, float yInit){
   if(tInit == tN){ //facing North
@@ -219,7 +222,22 @@ void driveAroundObstacle(float tInit, float xInit, float yInit){
 }
 
 /**
- * Lowers the winch for 5 seconds and then stops
+ * Adjusts the OSV's angle and coordinates to it is facing the
+ * mission site and close enough to lower the pH sensor
+ */
+void positionOSVatMS(){
+  //TODO
+  //ideas: calculate theta to face MS and turn to that angle
+    //drive until sensors detect onstacle within 2 cm
+  // Calculate theta to face MS
+  double dx = xMS-xPos;
+  double dy = max(yPos, yMS)-min(yPos, yMS);
+  double tMS = atan(dy/dx);
+  turnToTheta(tMS);
+}
+
+/**
+ * Lowers the winch for 1.5 seconds and then stops
  */
 void missionSiteInit(){
   winchServo.write(130);
@@ -230,24 +248,34 @@ void missionSiteInit(){
 /**
  * Reads and transmits the voltage & pH value
  * Code found online, slighly modified for our purpose
+ * Updates successful based on pH reading
  */
-void missionSiteLoop(){
-  static unsigned long samplingTime = millis();
-  static unsigned long printTime = millis();
+void readPH(){
+  boolean readPH = false;
   static float pHValue,voltage;
-  if(millis()-samplingTime > samplingInterval)  {
-    pHArray[pHArrayIndex++]=analogRead(SensorPin);
-    if(pHArrayIndex==ArrayLenth)pHArrayIndex=0;
-    voltage = avergearray(pHArray, ArrayLenth)*5.0/1024;
-    pHValue = 3.5*voltage+Offset;
-    samplingTime=millis();
+  while(!readPH){
+    static unsigned long samplingTime = millis();
+    static unsigned long printTime = millis();
+    if(millis()-samplingTime > samplingInterval)  {
+      pHArray[pHArrayIndex++]=analogRead(SensorPin);
+      if(pHArrayIndex==ArrayLenth)pHArrayIndex=0;
+      voltage = avergearray(pHArray, ArrayLenth)*5.0/1024;
+      pHValue = 3.5*voltage+Offset;
+      samplingTime=millis();
+    }
+    //Every 800 milliseconds, print a numerical
+    if(millis() - printTime > printInterval){   
+      enes.baseObjective(pHValue);
+      enes.print("Voltage:");
+      enes.print(voltage);
+      enes.print("    pH value: ");
+      enes.println(pHValue);
+      printTime=millis();
+      readPH = true;
+    }
   }
-  if(millis() - printTime > printInterval){   //Every 800 milliseconds, print a numerical, convert the state of the LED indicator
-    enes.print("Voltage:");
-    enes.print(voltage);
-    enes.print("    pH value: ");
-    enes.println(pHValue);
-    printTime=millis();
+  if(pHValue < 7){ //TODO - is this a reasonable test of success?
+    successful = true;
   }
 }
 
@@ -291,6 +319,20 @@ double avergearray(int* arr, int number){
     avg = (double)amount/(number-2);
   }//if
   return avg;
+}
+
+/**
+ * Raises the winch, adjusts the OSV's positioning, and tries again
+ */
+void retryMS(){
+  //raises winch
+  winchServo.write(50);
+  delay(1500);
+  winchServo.write(90);
+  //TODO - adjusts position
+  //lowers winch and tries to read the pH again
+  missionSiteInit();
+  readPH();
 }
 
 /**
