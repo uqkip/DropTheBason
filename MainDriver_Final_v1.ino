@@ -78,6 +78,7 @@ void setup() {
 
   // Drive to correct y-coord & turn East
   driveYCoordMS();
+  enes.println("Made to y-coord first time");
 
   // Drive across rocky terrain
   while(xPos < 1.2){
@@ -86,9 +87,11 @@ void setup() {
       driveStop(0);
     }
   }
+  enes.println("Crossed the rocky terrain");
 
   // Readjust to correct y-coord & facing East
-  driveYCoordMS();  
+  driveYCoordMS();
+  enes.println("Made to y-coord second time");  
 
   // Update the state of the driver
   state = NO_OBSTACLE;
@@ -103,6 +106,7 @@ void loop() {
   //Switch for different possible states of the OSV
   switch (state){
     case NO_OBSTACLE:
+      enes.println("No Obstacle");
       if(xPos < xMS-.2){
         driveForward(1);
         checkForObstacles();
@@ -111,6 +115,7 @@ void loop() {
       }
       break;
     case OBSTACLE:
+      enes.println("Obstacle");
       //TODO - account for if only one sensor found an obstacle
       float tTurn;
       tTurn = turnToAvoidObstacle();
@@ -119,9 +124,10 @@ void loop() {
       //TODO - what if it made it to the MS in the middle of this?
       break;
     case MISSION_SITE:
+      enes.println("Mission Site");
       positionOSVatMS();
       enes.println("Made it to the mission site!");
-      enes.navigated();
+      //enes.navigated();
       missionSiteInit();
       readPH();
       while(!successful){
@@ -243,6 +249,7 @@ void missionSiteInit(){
   winchServo.write(130);
   delay(1500);
   winchServo.write(90);
+  winchServo.detach();
 }
 
 /**
