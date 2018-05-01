@@ -59,6 +59,10 @@ int pHArrayIndex=0;
 #define trigPinR 2
 #define echoPinR 3
 
+// Sponge Servo Set-Up
+#define spongePin 11
+Servo spongeServo;
+
 void setup() {
   //Initialize Pins
   pinMode(lm1, OUTPUT);
@@ -71,6 +75,8 @@ void setup() {
   pinMode(trigPinR, OUTPUT);
   pinMode(echoPinL, INPUT);
   pinMode(echoPinR, INPUT);
+  spongeServo.attach(spongePin);
+  spongeServo.write(90);
 
   // Get Coordinates
   updateCoordMS();
@@ -129,6 +135,7 @@ void loop() {
       enes.println("Made it to the mission site!");
       //enes.navigated();
       missionSiteInit();
+      collectWater();
       readPH();
       while(!successful){
         retryMS();
@@ -249,7 +256,17 @@ void missionSiteInit(){
   winchServo.write(130);
   delay(1500);
   winchServo.write(90);
-  winchServo.detach();
+  //winchServo.detach();
+}
+
+void collectWater(){
+  spongeServo.write(130);
+  delay(1500);  //TODO calibrate
+  spongeServo.write(90);
+  delay(3000);
+  spongeServo.write(50);
+  delay(1500);  //TODO calibrate
+  spongeServo.write(90);
 }
 
 /**
