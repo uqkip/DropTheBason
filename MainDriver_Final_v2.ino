@@ -205,24 +205,38 @@ float turnToAvoidObstacle(){
  * Ends facing East
  */
 void driveAroundObstacle(float tInit, float xInit, float yInit){
+  enes.println("Driving around obstacle");
   if(tInit == tN){ //facing North
+    enes.println("Facing North");
     // Drive N 35 cm
+    enes.print("yPos: ");
+    enes.print(yPos);
+    enes.print("  yInit: ");
+    enes.println(yInit);
     while(yPos < yInit+.35){
       driveForward(1);
       while(!updateCoordOSV()){
         driveStop(0);    
       }
     }
+    enes.println("Drove north 35 cm");
   } else { //facing South
+    enes.println("Facing South");
     // Drive S 35 cm
+    enes.print("yPos: ");
+    enes.print(yPos);
+    enes.print("  yInit: ");
+    enes.println(yInit);
     while(yPos > yInit-.35){
       driveForward(1);
       while(!updateCoordOSV()){
         driveStop(0);   
       } 
     }
+    enes.println("Drove south 35 cm");
   }
   // Drive E 35 cm
+  enes.println("Turning East");
   turnToTheta(tE);
   while(xPos < xInit+.35){
     driveForward(1);
@@ -230,8 +244,10 @@ void driveAroundObstacle(float tInit, float xInit, float yInit){
       driveStop(0);    
     }
   }
+  enes.println("Drove east 35 cm");
   // Return to MS y-coord and face E
   driveYCoordMS();
+  enes.println("Returned to ready position (yMS & E)");
 }
 
 /**
