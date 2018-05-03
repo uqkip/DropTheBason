@@ -16,7 +16,7 @@ float xMS, yMS, xPos, yPos, theta;
 #define tN 1.57
 #define tS -1.57
 #define tE 0
-#define tolerance 0.1
+#define tolerance 0.3
 enum states {
   LANDING_ZONE,
   NO_OBSTACLE,
