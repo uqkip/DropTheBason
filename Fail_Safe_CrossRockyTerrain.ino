@@ -24,13 +24,6 @@ enum states {
   MISSION_SITE
 };
 states state = LANDING_ZONE;
-/* enum obstacle {
-  LEFT,
-  RIGHT,
-  BOTH,
-  NONE
-};
-obstacle detected = NONE; */
 boolean successful = false;
 
 // Motor Controller Set-Up
@@ -63,6 +56,12 @@ int pHArrayIndex=0;
 #define spongePin 11
 Servo spongeServo;
 
+// Timed Control Constants
+int ms_m = 4430; //miliseconds per meter
+int ms_rad = 2045; //miliseconds per radian
+int turn_offset = 150;  //how long to reduce turn by for every 90 degrees longer it is
+float currTheta; //theta that's manually updated by directed motions
+
 void setup() {
   //Initialize Pins
   pinMode(lm1, OUTPUT);
@@ -77,32 +76,55 @@ void setup() {
   pinMode(echoPinL, INPUT);
   pinMode(echoPinR, INPUT);
 
-
-  // Get Coordinates
+  // Get Initial Coordinates
   updateCoordMS();
   updateCoordOSV();
 
   // Drive to correct y-coord & turn East
-  //TODO - will use predetermined times for everthing instead of updating location (therefore super inaccurate but not reliant on marker)
+  currTheta = theta;
+  if(yPos<yMS){
+    timedTurn(tN);
+  } else if (yPos>yMS){
+    timedTurn(tS);
+  }
+  long timeForward = (max(yPos, yMS)-min(yPos, yMS))*ms_m;
+  driveForward(timeForward);
+  timedTurn(tE);
+  enes.println("In ready position in landing zone");
 
   // Drive across rocky terrain
-  while(xPos < 1.2){
-    driveForward(1);
-    while(!updateCoordOSV()){
-      driveStop(0);
-    }
-  }
+  driveForward(0.7*ms_m);
   enes.println("Crossed the rocky terrain");
 
-  // Readjust to correct y-coord & facing East
-//  driveYCoordMS();
-//  enes.println("Made to y-coord second time");  
+  // Continue straight to the mission site (assuming no obstacles)
+  updateCoordOSV();
+  timeForward = (xMS-xPos-.33)*ms_m;
+  driveForward(timeForward);
 
-  // Update the state of the driver
-  state = NO_OBSTACLE;
+  // Mission Site Routine
+  missionSiteInit();
+  readPH();
+}
+
+void timedTurn(float angle){
+  float delta = max(currTheta, angle)-min(currTheta, angle);
+  long timeToTurn;
+  if(delta<pi/2){
+    timeToTurn = delta*ms_rad;
+  } else {
+    float over90 = (delta-pi/2)/(pi/2);
+    timeToTurn = delta*ms_rad-over90*turn_offset;
+  }
+  if(angle>currTheta){
+    driveLeft(timeToTurn);
+  } else {
+    driveRight(timeToTurn);
+  }
+  currTheta = angle;
 }
 
 void loop() {
+  /*
   // Wait until the OSV location has been updated
   while(!updateCoordOSV()){
     driveStop(0);
@@ -143,7 +165,7 @@ void loop() {
     default:
       enes.println("*** Error - Read Impossible State ***");
   }
-}
+*/}
 
 /**
  * Determines if there are any obstacles within 15 cm and
@@ -316,7 +338,7 @@ void readPH(){
       samplingTime=millis();
     }
     //Every 800 milliseconds, print a numerical
-    if(millis() - printTime > printInterval){   
+    if(millis() - printTime > printInterval && readPH == false){   
       enes.baseObjective(pHValue);
       enes.print("Voltage:");
       enes.print(voltage);
@@ -600,6 +622,7 @@ void driveForward(long time){
   while(millis() < (start_time+time)){
     //delay for time miliseconds
   }
+  driveStop(0);
 }
 
 /**
@@ -615,6 +638,7 @@ void driveBackward(long time){
   while(millis() < (start_time+time)){
     //delay for time miliseconds
   }
+  driveStop(0);
 }
 
 /**
@@ -630,6 +654,7 @@ void driveRight(long time){
   while(millis() < (start_time+time)){
     //delay for time miliseconds
   }
+  driveStop(0);
 }
 
 /**
@@ -645,6 +670,7 @@ void driveLeft(long time){
   while(millis() < (start_time+time)){
     //delay for time miliseconds
   }
+  driveStop(0);
 }
 
 /**
