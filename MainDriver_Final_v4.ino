@@ -58,7 +58,7 @@ int pHArrayIndex=0;
 Servo spongeServo;
 
 // Timed Control Values Set-Up
-int ms_m = 4430;  //milliseconds per meter
+int ms_m = 4255;  //milliseconds per meter
 int ms_rad = 2045; //milliseconds per radian
 int turn_offset = 150;  //how many ms faster a 90 degree turn is in a donut
 
@@ -75,8 +75,8 @@ void setup() {
 
   // Get Starting Coordinates
   updateCoordMS();
-  updateCoordOSV();
-
+  while(!updateCoordOSV()){}
+  
   // Drive to correct y-coord & turn East
   driveYCoordMS();
   enes.println("Made to y-coord first time");
@@ -144,10 +144,15 @@ void loop() {
  * mission site and close enough to lower the pH sensor
  */
 void positionOSVatMS(){
+  enes.println("Positioning OSV at MS");
   double dx = xMS-xPos;
   double dy = max(yPos, yMS)-min(yPos, yMS);
   double tMS = atan(dy/dx);
   timedTurn(tMS);
+  enes.println("facing MS");
+  double dMS = sqrt(dx*dx+dy*dy);
+  driveForward(dMS*ms_m);
+  enes.println("drove to MS");
 }
 
 /**
@@ -258,7 +263,7 @@ double avergearray(int* arr, int number){
 void driveAroundObstacle(float tInit, float xInit, float yInit){
   enes.println("Driving around obstacle");
   // Drive N or S 50 cm
-  driveForward(.5*ms_m);
+  driveForward(.35*ms_m);
   enes.println("Drove north / south 50 cm");
   // Drive E 50 cm
   enes.println("Turning East");
@@ -269,8 +274,12 @@ void driveAroundObstacle(float tInit, float xInit, float yInit){
   while(!updateCoordOSV()){
     //wait until location is updated
   }
-  driveYCoordMS();
-  enes.println("Returned to ready position (yMS & E)");
+  if(xPos>xMS || xMS-xPos<m_tolerance){
+    state = MISSION_SITE;
+  } else {
+    driveYCoordMS();
+    enes.println("Returned to ready position (yMS & E)");
+  }
 }
 
 /**
@@ -279,6 +288,7 @@ void driveAroundObstacle(float tInit, float xInit, float yInit){
  * return - theta the OSV ends up facing
  */
 float turnToAvoidObstacle(){
+  driveBackward(.15*ms_m);
   if(yPos > 1){
     timedTurn(tS);
     return tS;
@@ -297,7 +307,7 @@ boolean checkForObstacles(){
   //Get the distance each sensor is detecting
   int dL = getDistance(trigPinL, echoPinL);
   int dR = getDistance(trigPinR, echoPinR);
-  //Determine if there is an obstacle within 15 cm
+  //Determine if there is an obstacle within 20 cm
   if(dL <= 20 || dR <= 20){
     return true;
   }
