@@ -82,10 +82,16 @@ void setup() {
   enes.println("Made to y-coord first time");
 
   // Cross the rocky terrain
-  driveForward(0.7*ms_m);
+  driveForward(0.8*ms_m);
   while(!updateCoordOSV()){
       //loop until coordinates are updated
+  }
+  while(xPos < 1.2){
+    driveForward(.1*ms_m);
+    while(!updateCoordOSV()){
+      //loop until coordinates are updated
     }
+  }
   enes.println("Crossed the rocky terrain");
 
   // Reposition at the correct y-coord if off by more than 10cm
@@ -121,7 +127,9 @@ void loop() {
       float tTurn;
       tTurn = turnToAvoidObstacle();
       driveAroundObstacle(tTurn, xPos, yPos);
-      checkForObstacles();
+      if(!checkForObstacles() && state != MISSION_SITE){
+        state = NO_OBSTACLE;
+      }
       break;
     case MISSION_SITE:
       enes.println("Mission Site");
@@ -264,10 +272,28 @@ void driveAroundObstacle(float tInit, float xInit, float yInit){
   enes.println("Driving around obstacle");
   // Drive N or S 50 cm
   driveForward(.35*ms_m);
-  enes.println("Drove north / south 50 cm");
+  enes.println("Drove north / south 35 cm");
   // Drive E 50 cm
   enes.println("Turning East");
-  timedTurn(tE);
+  while(max(tE, theta)-min(theta, tE)>rad_tolerance){
+    timedTurn(tE);
+    while(!updateCoordOSV()){
+      //loop until coordinates are updated
+    }
+  }
+  while(checkForObstacles()){
+    enes.println("Still blocked by obstacle");
+    timedTurn(tInit);
+    driveForward(.35*ms_m);
+    enes.println("Drove north / south 35 cm");
+    enes.println("Turning East");
+    while(max(tE, theta)-min(theta, tE)>rad_tolerance){
+      timedTurn(tE);
+      while(!updateCoordOSV()){
+        //loop until coordinates are updated
+      }
+    }
+  }
   driveForward(.5*ms_m);
   enes.println("Drove east 50 cm");
   // Return to MS y-coord and face E
